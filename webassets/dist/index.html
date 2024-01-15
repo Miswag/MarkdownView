@@ -1,12 +1,66 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="stylesheet" href="./main.css" />
-        <script src="./main.js"></script>
-    </head>
-    <body>
-        <div class="container" id="contents"></div>
-    </body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <link rel="stylesheet" href="./main.css" />
+    <script src="./main.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <style>
+      #contents {
+        font-family: Vazirmatn !important;
+        line-height:1.55;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="contents"></div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const content = document.getElementById("contents");
+        // Example usage
+        function detectLanguage(text) {
+          // Regular expression to check if the text contains Arabic characters
+          var arabicPattern = /[\u0600-\u06FF]/;
+          // Regular expression to check if the text contains English characters
+          var englishPattern = /[a-zA-Z]/;
+          // Check if the text contains Markdown syntax
+          var markdownPattern = /[#*\`]/;
+          // Decode HTML entities
+          function decodeEntities(encodedText) {
+            var elem = document.createElement("textarea");
+            elem.innerHTML = encodedText;
+            return elem.value;
+          }
+
+          var decodedText = decodeEntities(text);
+
+          if (
+            arabicPattern.test(decodedText) &&
+            !englishPattern.test(decodedText) &&
+            !markdownPattern.test(decodedText)
+          ) {
+            content.dir = "rtl";
+          } else if (
+            englishPattern.test(decodedText) &&
+            !arabicPattern.test(decodedText) &&
+            !markdownPattern.test(decodedText)
+          ) {
+            content.dir = "ltr";
+          } else {
+            content.dir = "rtl";
+          }
+        }
+        // Call detectLanguage after the DOM is fully loaded
+        detectLanguage(content.innerText);
+      });
+    </script>
+  </body>
 </html>
