@@ -48,7 +48,9 @@ open class MarkdownView: UIView {
     }
   }
 
-  @objc public func load(markdown: String?, enableImage: Bool = true) {
+  @objc public func load(markdown: String?, enableImage: Bool = true, 
+                          enableZoom: Bool = true,
+                          enableTextSelection: Bool = true) {
     guard let markdown = markdown else { return }
 
     let bundle = Bundle(for: MarkdownView.self)
@@ -88,11 +90,32 @@ open class MarkdownView: UIView {
       self.webView = wv
 
       wv.load(templateRequest)
+      if !enableZoom {
+        disableZoomScript()
+      }
+      if !enableTextSelection {
+        disableTextSelectionScript()
+      }
     } else {
       // TODO: raise error
     }
   }
-
+    private func disableZoomScript() {
+        let source: String = "var meta = document.createElement('meta');" +
+        "meta.name = 'viewport';" +
+        "meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';" +
+        "var head = document.getElementsByTagName('head')[0];" + "head.appendChild(meta);"
+        let script = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        webView?.configuration.userContentController.addUserScript(script)
+    }
+    
+    private func disableTextSelectionScript() {
+        let selectionScript = WKUserScript(source: """
+                    document.body.style.webkitTouchCallout='none';
+                    document.body.style.webkitUserSelect='none';
+                """, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        webView?.configuration.userContentController.addUserScript(selectionScript)
+    }
   private func escape(markdown: String) -> String? {
     return markdown.addingPercentEncoding(withAllowedCharacters: CharacterSet.alphanumerics)
   }
